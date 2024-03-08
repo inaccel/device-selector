@@ -81,7 +81,7 @@ func (plugin pciHostDevicePlugin) Allocate(ctx context.Context, request *devicep
 		var devices []*devicepluginv1beta1.DeviceSpec
 		for _, devicesID := range containerRequest.DevicesIDs {
 			for _, pciDevice := range lspci.ListAll() {
-				if pciDevice.Slot == devicesID {
+				if pciDevice.Slot[:len(pciDevice.Slot)-1] == devicesID[:len(devicesID)-1] {
 					if pciDevice.Driver != "vfio-pci" {
 						if pciDevice.Driver != "" {
 							if err := pci.Driver(pciDevice.Driver).Unbind(pciDevice.Slot); err != nil {
@@ -102,7 +102,9 @@ func (plugin pciHostDevicePlugin) Allocate(ctx context.Context, request *devicep
 							Permissions:   "mrw",
 						})
 					}
-					envValue = envValue + pciDevice.Slot
+					if pciDevice.Slot == devicesID {
+						envValue = envValue + pciDevice.Slot
+					}
 				}
 			}
 			envValue = envValue + ","

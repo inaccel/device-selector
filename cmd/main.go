@@ -61,7 +61,9 @@ func main() {
 				return err
 			}
 
-			var new []plugin.New
+			new := []plugin.New{
+				internal.NewHook(context.Context),
+			}
 			if kubeVirt.Spec.Configuration.PermittedHostDevices != nil {
 				for _, pciHostDevice := range kubeVirt.Spec.Configuration.PermittedHostDevices.PciHostDevices {
 					if pciHostDevice.ExternalResourceProvider {
