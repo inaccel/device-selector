@@ -15,5 +15,16 @@ func listen(path string) (net.Listener, error) {
 		return nil, err
 	}
 
-	return net.Listen("unix", path)
+	listener, err := net.Listen("unix", path)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := os.Chmod(path, os.ModePerm); err != nil {
+		listener.Close()
+
+		return nil, err
+	}
+
+	return listener, nil
 }
